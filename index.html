@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="My Cookbooks">
+<title>My Cookbooks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --accent: #FF0033;
+  --black: #111111;
+  --gray-1: #F7F7F7;
+  --gray-2: #E8E8E8;
+  --gray-3: #AAAAAA;
+  --gray-4: #666666;
+  --white: #FFFFFF;
+  --hairline: rgba(0,0,0,0.09);
+  --radius-chip: 999px;
+  --radius-tile: 14px;
+  --recipe-tile: 46px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  font-family: 'Figtree', sans-serif;
+  background: var(--white);
+  color: var(--black);
+  height: 100%;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ── HEADER ── */
+#header {
+  background: var(--white);
+  border-bottom: 0.5px solid var(--hairline);
+  padding: calc(var(--safe-top) + 14px) 16px 12px;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+#header-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+#back-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-left: -6px;
+}
+
+#back-btn.visible { display: flex; }
+
+#back-btn svg { width: 20px; height: 20px; }
+
+#title {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--black);
+  letter-spacing: -0.5px;
+  line-height: 1;
+  flex: 1;
+}
+
+#recipe-count-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-3);
+  letter-spacing: 0;
+}
+
+/* ── SEARCH BAR ── */
+#search-wrap {
+  position: relative;
+}
+
+#search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-3);
+  pointer-events: none;
+  width: 16px;
+  height: 16px;
+}
+
+#search {
+  width: 100%;
+  height: 40px;
+  background: var(--gray-1);
+  border: none;
+  border-radius: 999px;
+  padding: 0 36px 0 34px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--black);
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+#search::placeholder { color: var(--gray-3); }
+#search:focus { background: #EFEFEF; }
+
+#clear-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  background: var(--gray-3);
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 11px;
+}
+#clear-btn.visible { display: flex; }
+
+/* ── DIET CHIPS ── */
+#diet-chips {
+  display: none;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-top: 10px;
+}
+#diet-chips.visible { display: flex; }
+#diet-chips::-webkit-scrollbar { display: none; }
+
+.chip {
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: none;
+  background: var(--gray-1);
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-4);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.chip.active {
+  background: var(--black);
+  color: var(--white);
+}
+
+/* ── BOOK FILTER BAR ── */
+#book-filter-bar {
+  display: none;
+  background: var(--white);
+  border-bottom: 0.5px solid var(--hairline);
+  padding: 8px 16px;
+  flex-shrink: 0;
+  z-index: 15;
+}
+#book-filter-bar.visible { display: block; }
+
+#book-filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 7px;
+}
+
+#book-chips-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+#book-chips-row::-webkit-scrollbar { display: none; }
+
+.book-chip {
+  flex-shrink: 0;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: none;
+  background: var(--gray-1);
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-4);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s ease;
+}
+.book-chip.active {
+  background: var(--accent);
+  color: var(--white);
+}
+#book-filter-clear {
+  flex-shrink: 0;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: none;
+  background: var(--gray-2);
+  font-family: 'Figtree', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-4);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ── RESULTS META ── */
+#results-meta {
+  padding: 7px 16px 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-3);
+  flex-shrink: 0;
+  min-height: 22px;
+}
+
+/* ── SCROLL AREA ── */
+#scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ══════════════════════════════════════
+   HOME SCREEN — FILTER GRID
+══════════════════════════════════════ */
+#home-screen {
+  padding: 14px 16px calc(var(--safe-bottom) + 24px);
+}
+
+.home-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-3);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 16px 0 8px;
+}
+.home-section-label:first-child { margin-top: 0; }
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.filter-tile {
+  border-radius: var(--radius-tile);
+  padding: 16px 14px 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+  border: none;
+  text-align: left;
+  font-family: 'Figtree', sans-serif;
+  animation: fadeUp 0.35s ease both;
+  min-height: 90px;
+  position: relative;
+  overflow: hidden;
+}
+.filter-tile:active { transform: scale(0.96); opacity: 0.85; }
+
+.filter-tile-emoji {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.filter-tile-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--black);
+  line-height: 1.2;
+}
+
+.filter-tile-count {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(0,0,0,0.4);
+}
+
+/* ══════════════════════════════════════
+   RECIPE LIST
+══════════════════════════════════════ */
+#recipe-list { display: none; }
+#recipe-list.visible { display: block; }
+
+/* Book Group Header */
+.book-group-header {
+  position: sticky;
+  top: 0;
+  background: var(--gray-1);
+  border-bottom: 0.5px solid var(--hairline);
+  padding: 6px 16px;
+  z-index: 5;
+}
+.book-group-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gray-4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.book-group-sub {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--gray-3);
+  margin-top: 1px;
+}
+
+/* Recipe Row */
+.recipe-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 0.5px solid var(--hairline);
+  background: var(--white);
+  animation: fadeUp 0.28s ease both;
+}
+.recipe-row:active { background: var(--gray-1); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.emoji-tile {
+  width: var(--recipe-tile);
+  height: var(--recipe-tile);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.recipe-info { flex: 1; min-width: 0; }
+
+.recipe-name-row {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.recipe-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--black);
+  line-height: 1.3;
+}
+.cuisine-flag { font-size: 15px; flex-shrink: 0; }
+
+.recipe-english {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--gray-4);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recipe-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.recipe-book-name { font-size: 12px; color: var(--gray-3); }
+.page-num { font-size: 12px; font-weight: 500; color: var(--gray-3); }
+
+/* Diet pills */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.pill-vegan { background: #DCFCE7; color: #166534; }
+.pill-veg   { background: #D1FAE5; color: #065F46; }
+.pill-pesc  { background: #DBEAFE; color: #1E40AF; }
+.pill-gf    { background: #FEF3C7; color: #92400E; }
+
+/* Empty */
+#empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 32px;
+  text-align: center;
+  gap: 10px;
+}
+#empty.visible { display: flex; }
+#empty-icon { font-size: 44px; }
+#empty-title { font-size: 17px; font-weight: 600; }
+#empty-sub { font-size: 14px; color: var(--gray-3); line-height: 1.5; }
+
+/* Loading */
+#loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  gap: 14px;
+  color: var(--gray-3);
+  font-size: 14px;
+  font-weight: 500;
+}
+.spinner {
+  width: 26px; height: 26px;
+  border: 2.5px solid var(--gray-2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="header">
+    <div id="header-top">
+      <button id="back-btn" aria-label="Back">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 4l-6 6 6 6"/>
+        </svg>
+      </button>
+      <div id="title">My Cookbooks</div>
+      <div id="recipe-count-badge"></div>
+    </div>
+
+    <div id="search-wrap">
+      <svg id="search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="8.5" cy="8.5" r="5.5"/>
+        <path d="M13 13l3.5 3.5" stroke-linecap="round"/>
+      </svg>
+      <input id="search" type="search" placeholder="Search recipes, ingredients…" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button id="clear-btn" aria-label="Clear">✕</button>
+    </div>
+
+    <div id="diet-chips">
+      <button class="chip active" data-filter="all">All</button>
+      <button class="chip" data-filter="vegan">🌱 Vegan</button>
+      <button class="chip" data-filter="vegetarian">🥦 Vegetarian</button>
+      <button class="chip" data-filter="pescatarian">🐟 Pescatarian</button>
+      <button class="chip" data-filter="gluten-free">🌾 Gluten-Free</button>
+    </div>
+  </div>
+
+  <div id="book-filter-bar">
+    <div id="book-filter-label">Filter by book</div>
+    <div id="book-chips-row">
+      <button id="book-filter-clear">All Books</button>
+    </div>
+  </div>
+
+  <div id="results-meta"></div>
+
+  <div id="scroll-area">
+    <div id="loading"><div class="spinner"></div>Loading recipes…</div>
+    <div id="home-screen" style="display:none"></div>
+    <div id="recipe-list"></div>
+    <div id="empty"><div id="empty-icon">🔍</div><div id="empty-title">No recipes found</div><div id="empty-sub">Try different terms<br>or adjust filters</div></div>
+  </div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let ALL_RECIPES = [];
+let ALL_BOOKS   = {}; // id → book obj, ordered
+let activeDietFilter  = 'all';
+let activeTagFilter   = null;   // from home grid tap
+let activeBookFilters = new Set(); // multi-select
+let searchQuery = '';
+let mode = 'home'; // 'home' | 'browse' | 'search'
+
+// ─────────────────────────────────────────────
+// HOME GRID CONFIG
+// ─────────────────────────────────────────────
+const HOME_TILES = [
+  // Diet
+  { tag: 'vegan',        label: 'Vegan',       emoji: '🌱', bg: '#DCFCE7' },
+  { tag: 'vegetarian',   label: 'Vegetarian',  emoji: '🥦', bg: '#D1FAE5' },
+  { tag: 'gluten-free',  label: 'Gluten-Free', emoji: '🌾', bg: '#FEF9C3' },
+  { tag: 'pescatarian',  label: 'Pescatarian', emoji: '🐟', bg: '#DBEAFE' },
+  // Meal type
+  { tag: 'breakfast',    label: 'Breakfast',   emoji: '🍳', bg: '#FEF3C7' },
+  { tag: 'soup',         label: 'Soups',       emoji: '🍲', bg: '#E0F2FE' },
+  { tag: 'salad',        label: 'Salads',      emoji: '🥗', bg: '#DCFCE7' },
+  { tag: 'dessert',      label: 'Desserts',    emoji: '🍰', bg: '#FCE7F3' },
+  { tag: 'pasta',        label: 'Pasta',       emoji: '🍝', bg: '#F3E8FF' },
+  { tag: 'baking',       label: 'Baking',      emoji: '🧁', bg: '#FFF0DC' },
+  // Key ingredients
+  { tag: 'legumes',      label: 'Legumes',     emoji: '🫘', bg: '#FED7AA' },
+  { tag: 'seafood',      label: 'Seafood',     emoji: '🦐', bg: '#E0F2FE' },
+  { tag: 'tofu',         label: 'Tofu',        emoji: '⬜', bg: '#F1F5F9' },
+  { tag: 'chicken',      label: 'Chicken',     emoji: '🍗', bg: '#FFF0DC' },
+  { tag: 'rice',         label: 'Rice',        emoji: '🍚', bg: '#F0FDF4' },
+  { tag: 'noodles',      label: 'Noodles',     emoji: '🍜', bg: '#F0F9FF' },
+  // Cuisines
+  { tag: 'turkish',      label: 'Turkish',     emoji: '🇹🇷', bg: '#FEE2E2' },
+  { tag: 'italian',      label: 'Italian',     emoji: '🇮🇹', bg: '#DCFCE7' },
+  { tag: 'korean',       label: 'Korean',      emoji: '🇰🇷', bg: '#FEE2E2' },
+  { tag: 'indian',       label: 'Indian',      emoji: '🇮🇳', bg: '#FEF3C7' },
+  { tag: 'mexican',      label: 'Mexican',     emoji: '🇲🇽', bg: '#DCFCE7' },
+  { tag: 'dominican',    label: 'Dominican',   emoji: '🇩🇴', bg: '#DBEAFE' },
+  { tag: 'greek',        label: 'Greek',       emoji: '🇬🇷', bg: '#DBEAFE' },
+  { tag: 'levantine',    label: 'Levantine',   emoji: '🌙',  bg: '#EDE9FE' },
+];
+
+const HOME_SECTIONS = [
+  { label: 'Diet',        tags: ['vegan','vegetarian','gluten-free','pescatarian'] },
+  { label: 'By Type',     tags: ['breakfast','soup','salad','dessert','pasta','baking'] },
+  { label: 'Ingredient',  tags: ['legumes','seafood','tofu','chicken','rice','noodles'] },
+  { label: 'Cuisine',     tags: ['turkish','italian','korean','indian','mexican','dominican','greek','levantine'] },
+];
+
+// ─────────────────────────────────────────────
+// EMOJI RULES
+// ─────────────────────────────────────────────
+const EMOJI_RULES = [
+  [/\b(lamb|mutton|rack of lamb)\b/i,                        '🍖','#FFE4E1'],
+  [/\b(chicken|hen|turkey|poultry)\b/i,                      '🍗','#FFF0DC'],
+  [/\b(beef|steak|brisket|short rib|oxtail|veal)\b/i,        '🥩','#FFDDD5'],
+  [/\b(pork|bacon|ham|pancetta|prosciutto|chorizo|sausage)\b/i,'🥓','#FFE0D6'],
+  [/\b(duck|goose)\b/i,                                      '🦆','#FFE9CC'],
+  [/\b(salmon|tuna|cod|halibut|sea bass|swordfish|fish|anchov|sardine|mackerel|trout|tilapia|snapper)\b/i,'🐟','#DBEAFE'],
+  [/\b(shrimp|prawn|lobster|crab|crawfish|scallop|clam|mussel|oyster|octopus|squid|calamari|ceviche|conch|whitefish)\b/i,'🦐','#E0F2FE'],
+  [/\b(sushi|maki|temaki)\b/i,                               '🍱','#E0F2FE'],
+  [/\b(egg|frittata|omelette|omelet|quiche|shakshuka)\b/i,   '🥚','#FEF9C3'],
+  [/\b(cheese|ricotta|mozzarella|parmesan|feta|brie|halloumi|burrata|paneer|labneh)\b/i,'🧀','#FEF3C7'],
+  [/\b(pasta|spaghetti|fettuccine|pappardelle|tagliatelle|linguine|rigatoni|penne|farfalle|gnocchi|lasagna|lasagne|cannelloni|ravioli|tortellini|orzo|paccheri|bucatini|fusilli|maltagliati|garganelli|culurgione|corzetti)\b/i,'🍝','#F3E8FF'],
+  [/\b(noodle|ramen|udon|soba|pad thai|pho|kelp noodle|zucchini.fettuccine)\b/i,'🍜','#F0F9FF'],
+  [/\b(risotto|rice|pilaf|paella|biryani|congee|fried rice|arancini)\b/i,'🍚','#DCFCE7'],
+  [/\b(quinoa|farro|barley|couscous|bulgur|tabouleh|tabbouleh|millet|amaranth)\b/i,'🌾','#FEF3C7'],
+  [/\b(bread|toast|bruschetta|crostini|flatbread|naan|pita|roti|tortilla|arepa|breadstick)\b/i,'🍞','#FEF9C3'],
+  [/\b(pizza)\b/i,                                           '🍕','#FFF0DC'],
+  [/\b(taco|burrito|fajita|enchilada|quesadilla)\b/i,        '🌮','#FFF3DC'],
+  [/\b(lentil|dal|dhal)\b/i,                                 '🫘','#FED7AA'],
+  [/\b(chickpea|hummus|falafel)\b/i,                         '🟡','#FEF08A'],
+  [/\b(bean|black bean|kidney bean|white bean|cannellini|edamame)\b/i,'🫘','#D1FAE5'],
+  [/\b(tofu|tempeh)\b/i,                                     '⬜','#F1F5F9'],
+  [/\b(eggplant|aubergine|melanzane)\b/i,                    '🍆','#EDE9FE'],
+  [/\b(mushroom|funghi|truffle|portobello|shiitake|morel|chanterelle|porcini)\b/i,'🍄','#F5F0EB'],
+  [/\b(tomato|pomodoro|marinara|puttanesca)\b/i,             '🍅','#FEE2E2'],
+  [/\b(avocado|guacamole)\b/i,                               '🥑','#DCFCE7'],
+  [/\b(corn|polenta|maize|elote)\b/i,                        '🌽','#FEF9C3'],
+  [/\b(carrot)\b/i,                                          '🥕','#FED7AA'],
+  [/\b(broccoli|cauliflower|broccolini)\b/i,                 '🥦','#D1FAE5'],
+  [/\b(spinach|kale|chard|arugula|watercress)\b/i,           '🥬','#DCFCE7'],
+  [/\b(pea|snap pea|green bean)\b/i,                         '🫛','#BBF7D0'],
+  [/\b(pepper|capsicum|jalapeño|chipotle|paprika)\b/i,       '🌶','#FEE2E2'],
+  [/\b(squash|zucchini|courgette|pumpkin|butternut)\b/i,     '🎃','#FED7AA'],
+  [/\b(sweet potato|yam)\b/i,                                '🍠','#FED7AA'],
+  [/\b(potato)\b/i,                                          '🥔','#FEF3C7'],
+  [/\b(cucumber)\b/i,                                        '🥒','#DCFCE7'],
+  [/\b(cabbage|coleslaw|slaw|kimchi)\b/i,                    '🥬','#D1FAE5'],
+  [/\b(leek|onion|shallot|scallion)\b/i,                     '🧅','#FEF9C3'],
+  [/\b(garlic)\b/i,                                          '🧄','#FEF9C3'],
+  [/\b(peach|nectarine)\b/i,                                 '🍑','#FFE4CC'],
+  [/\b(mango)\b/i,                                           '🥭','#FEF3C7'],
+  [/\b(banana)\b/i,                                          '🍌','#FEF9C3'],
+  [/\b(strawberr|berr|raspberry|blueberr|blackberr|cranberr)\b/i,'🍓','#FCE7F3'],
+  [/\b(apple|pear|quince)\b/i,                               '🍎','#FEE2E2'],
+  [/\b(citrus|lemon|orange|grapefruit|lime|clementine)\b/i,  '🍋','#FEF9C3'],
+  [/\b(cherry|cherries)\b/i,                                 '🍒','#FCE7F3'],
+  [/\b(fig)\b/i,                                             '🫐','#EDE9FE'],
+  [/\b(grape|raisin)\b/i,                                    '🍇','#EDE9FE'],
+  [/\b(coconut)\b/i,                                         '🥥','#F0FDF4'],
+  [/\b(pineapple)\b/i,                                       '🍍','#FEF9C3'],
+  [/\b(watermelon|melon)\b/i,                                '🍉','#FCE7F3'],
+  [/\b(soup|bisque|chowder|broth|gazpacho)\b/i,              '🍲','#E0F2FE'],
+  [/\b(stew|ragù|ragu|braise|braised)\b/i,                   '🥘','#FFF0DC'],
+  [/\b(curry)\b/i,                                           '🍛','#FEF9C3'],
+  [/\b(salad|tabbouleh|tabouleh)\b/i,                        '🥗','#DCFCE7'],
+  [/\b(pancake|waffle|crepe|french toast)\b/i,               '🥞','#FEF9C3'],
+  [/\b(cake|cupcake|torte|tart|bundt|soufflé)\b/i,           '🎂','#FCE7F3'],
+  [/\b(cookie|biscuit|biscotti)\b/i,                         '🍪','#FEF3C7'],
+  [/\b(ice cream|sorbet|gelato|semifreddo|panna cotta)\b/i,  '🍦','#F0F9FF'],
+  [/\b(chocolate|mousse|brownie|ganache)\b/i,                '🍫','#FDE8D8'],
+  [/\b(pie|crumble|cobbler|crisp)\b/i,                       '🥧','#FEF3C7'],
+  [/\b(pudding|custard|flan|crème|creme)\b/i,                '🍮','#FEF9C3'],
+  [/\b(truffle|bonbon|candy)\b/i,                            '🍬','#FCE7F3'],
+  [/\b(baklava)\b/i,                                         '🍡','#EDE9FE'],
+  [/\b(cocktail|drink|juice|smoothie)\b/i,                   '🥤','#E0F2FE'],
+  [/\b(sauce|dressing|vinaigrette|marinade|pesto|aioli|chimichurri)\b/i,'🫙','#F1F5F9'],
+  [/\b(dip|baba|tzatziki|skordalia)\b/i,                     '🫙','#FEF9C3'],
+];
+
+const CUISINE_FLAGS = {
+  'turkish':'🇹🇷','italian':'🇮🇹','french':'🇫🇷','spanish':'🇪🇸','greek':'🇬🇷',
+  'moroccan':'🇲🇦','north-african':'🌍','algerian':'🇩🇿','egyptian':'🇪🇬',
+  'levantine':'🌙','lebanese':'🇱🇧','middle-eastern':'🌙','iranian':'🇮🇷',
+  'indian':'🇮🇳','korean':'🇰🇷','japanese':'🇯🇵','chinese':'🇨🇳','thai':'🇹🇭',
+  'vietnamese':'🇻🇳','indonesian':'🇮🇩','malaysian':'🇲🇾','filipino':'🇵🇭',
+  'burmese':'🇲🇲','georgian':'🇬🇪','german':'🇩🇪','dominican':'🇩🇴',
+  'puerto-rican':'🇵🇷','mexican':'🇲🇽','south-american':'🌎','caribbean':'🌴',
+  'west-african':'🌍','east-african':'🌍','american':'🇺🇸','asian':'🌏',
+};
+
+function getEmojiAndBg(name) {
+  for (const [re, emoji, bg] of EMOJI_RULES) {
+    if (re.test(name || '')) return { emoji, bg };
+  }
+  return { emoji: '🍽', bg: '#F5F5F5' };
+}
+
+function getCuisineFlag(tags) {
+  for (const t of (tags || [])) {
+    if (CUISINE_FLAGS[t]) return CUISINE_FLAGS[t];
+  }
+  return null;
+}
+
+function getDietPills(tags) {
+  const t = tags || [], pills = [];
+  if (t.includes('vegan'))           pills.push('<span class="pill pill-vegan">Vegan</span>');
+  else if (t.includes('vegetarian')) pills.push('<span class="pill pill-veg">Veg</span>');
+  if (t.includes('pescatarian') && !t.includes('vegan') && !t.includes('vegetarian'))
+    pills.push('<span class="pill pill-pesc">Pesc</span>');
+  if (t.includes('gluten-free'))     pills.push('<span class="pill pill-gf">GF</span>');
+  return pills.join('');
+}
+
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─────────────────────────────────────────────
+// ELEMENTS
+// ─────────────────────────────────────────────
+const homeScreen     = document.getElementById('home-screen');
+const recipeListEl   = document.getElementById('recipe-list');
+const emptyEl        = document.getElementById('empty');
+const metaEl         = document.getElementById('results-meta');
+const loadingEl      = document.getElementById('loading');
+const backBtn        = document.getElementById('back-btn');
+const titleEl        = document.getElementById('title');
+const badgeEl        = document.getElementById('recipe-count-badge');
+const dietChips      = document.getElementById('diet-chips');
+const bookFilterBar  = document.getElementById('book-filter-bar');
+const bookChipsRow   = document.getElementById('book-chips-row');
+const searchInput    = document.getElementById('search');
+const clearBtn       = document.getElementById('clear-btn');
+
+// ─────────────────────────────────────────────
+// RENDER HOME
+// ─────────────────────────────────────────────
+function buildHomeScreen() {
+  homeScreen.innerHTML = '';
+  const tileMeta = {};
+  HOME_TILES.forEach(t => { tileMeta[t.tag] = t; });
+
+  // Count recipes per tag
+  const tagCounts = {};
+  ALL_RECIPES.forEach(r => (r.tags||[]).forEach(t => { tagCounts[t] = (tagCounts[t]||0)+1; }));
+
+  HOME_SECTIONS.forEach((section, si) => {
+    const label = document.createElement('div');
+    label.className = 'home-section-label';
+    label.textContent = section.label;
+    homeScreen.appendChild(label);
+
+    const grid = document.createElement('div');
+    grid.className = 'filter-grid';
+
+    section.tags.forEach((tag, ti) => {
+      const meta = tileMeta[tag];
+      if (!meta) return;
+      const count = tagCounts[tag] || 0;
+      const tile = document.createElement('button');
+      tile.className = 'filter-tile';
+      tile.style.background = meta.bg;
+      tile.style.animationDelay = `${(si * 6 + ti) * 30}ms`;
+      tile.innerHTML = `
+        <div class="filter-tile-emoji">${meta.emoji}</div>
+        <div class="filter-tile-label">${meta.label}</div>
+        <div class="filter-tile-count">${count.toLocaleString()} recipes</div>`;
+      tile.addEventListener('click', () => enterBrowse(tag, meta.label));
+      grid.appendChild(tile);
+    });
+
+    homeScreen.appendChild(grid);
+  });
+}
+
+// ─────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────
+function showHome() {
+  mode = 'home';
+  activeTagFilter = null;
+  activeBookFilters.clear();
+  searchQuery = '';
+  searchInput.value = '';
+  clearBtn.classList.remove('visible');
+
+  homeScreen.style.display = 'block';
+  recipeListEl.classList.remove('visible');
+  emptyEl.classList.remove('visible');
+  backBtn.classList.remove('visible');
+  dietChips.classList.remove('visible');
+  bookFilterBar.classList.remove('visible');
+  metaEl.textContent = '';
+  badgeEl.textContent = `${ALL_RECIPES.length.toLocaleString()} recipes`;
+  titleEl.textContent = 'My Cookbooks';
+
+  // Reset diet chip
+  activeDietFilter = 'all';
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.filter === 'all'));
+  // Reset book chips
+  document.querySelectorAll('.book-chip').forEach(c => c.classList.remove('active'));
+}
+
+function enterBrowse(tag, label) {
+  mode = 'browse';
+  activeTagFilter = tag;
+  activeBookFilters.clear();
+  document.querySelectorAll('.book-chip').forEach(c => c.classList.remove('active'));
+
+  homeScreen.style.display = 'none';
+  recipeListEl.classList.add('visible');
+  backBtn.classList.add('visible');
+  dietChips.classList.add('visible');
+  bookFilterBar.classList.add('visible');
+  titleEl.textContent = label;
+  badgeEl.textContent = '';
+
+  // Reset diet chip
+  activeDietFilter = 'all';
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.filter === 'all'));
+
+  applyFilters();
+  document.getElementById('scroll-area').scrollTop = 0;
+}
+
+function enterSearch() {
+  if (mode === 'search') return;
+  mode = 'search';
+  activeTagFilter = null;
+  homeScreen.style.display = 'none';
+  recipeListEl.classList.add('visible');
+  backBtn.classList.add('visible');
+  dietChips.classList.add('visible');
+  bookFilterBar.classList.add('visible');
+  titleEl.textContent = 'Search';
+  badgeEl.textContent = '';
+  applyFilters();
+}
+
+// ─────────────────────────────────────────────
+// FILTER & RENDER
+// ─────────────────────────────────────────────
+function applyFilters() {
+  let filtered = ALL_RECIPES;
+
+  // Tag filter (from home grid)
+  if (activeTagFilter) {
+    filtered = filtered.filter(r => (r.tags||[]).includes(activeTagFilter));
+  }
+
+  // Diet filter
+  if (activeDietFilter !== 'all') {
+    filtered = filtered.filter(r => (r.tags||[]).includes(activeDietFilter));
+  }
+
+  // Multi-book filter
+  if (activeBookFilters.size > 0) {
+    filtered = filtered.filter(r => activeBookFilters.has(r.book_id));
+  }
+
+  // Search query
+  if (searchQuery.trim()) {
+    const terms = searchQuery.toLowerCase().trim().split(/\s+/);
+    filtered = filtered.filter(r => {
+      const hay = [r.name, r.english_name, r.original_name, r.chapter, ...(r.tags||[])]
+        .filter(Boolean).join(' ').toLowerCase();
+      return terms.every(t => hay.includes(t));
+    });
+  }
+
+  // In search mode: flat. In browse mode: grouped by book.
+  if (mode === 'search' && searchQuery.trim()) {
+    renderFlat(filtered);
+  } else {
+    renderGrouped(filtered);
+  }
+}
+
+function renderFlat(recipes) {
+  emptyEl.classList.toggle('visible', recipes.length === 0);
+  metaEl.textContent = recipes.length ? `${recipes.length.toLocaleString()} recipe${recipes.length!==1?'s':''}` : '';
+  if (!recipes.length) { recipeListEl.innerHTML = ''; return; }
+
+  const frag = document.createDocumentFragment();
+  recipes.forEach((r, i) => {
+    frag.appendChild(buildRow(r, i, true));
+  });
+  recipeListEl.innerHTML = '';
+  recipeListEl.appendChild(frag);
+}
+
+function renderGrouped(recipes) {
+  emptyEl.classList.toggle('visible', recipes.length === 0);
+  if (!recipes.length) {
+    recipeListEl.innerHTML = '';
+    metaEl.textContent = '';
+    return;
+  }
+
+  const groups = {};
+  recipes.forEach(r => { (groups[r.book_id] = groups[r.book_id]||[]).push(r); });
+  const bookOrder = Object.keys(ALL_BOOKS).filter(id => groups[id]);
+
+  metaEl.textContent = `${recipes.length.toLocaleString()} recipe${recipes.length!==1?'s':''} · ${bookOrder.length} book${bookOrder.length!==1?'s':''}`;
+
+  const frag = document.createDocumentFragment();
+  bookOrder.forEach(bookId => {
+    const book = ALL_BOOKS[bookId];
+    const bRecipes = groups[bookId];
+
+    const header = document.createElement('div');
+    header.className = 'book-group-header';
+    header.innerHTML = `<div class="book-group-title">${esc(book.title)}</div>
+      <div class="book-group-sub">${esc(book.author||'')} · ${bRecipes.length} recipe${bRecipes.length!==1?'s':''}</div>`;
+    frag.appendChild(header);
+
+    bRecipes.forEach((r, i) => frag.appendChild(buildRow(r, i, false)));
+  });
+
+  recipeListEl.innerHTML = '';
+  recipeListEl.appendChild(frag);
+}
+
+function buildRow(r, i, showBook) {
+  const { emoji, bg } = getEmojiAndBg(r.name);
+  const flag = getCuisineFlag(r.tags);
+  const pills = getDietPills(r.tags);
+  const showEnglish = r.english_name && r.english_name !== r.name;
+  const bookTitle = showBook && ALL_BOOKS[r.book_id] ? ALL_BOOKS[r.book_id].title : null;
+
+  const row = document.createElement('div');
+  row.className = 'recipe-row';
+  row.style.animationDelay = `${Math.min(i, 25) * 14}ms`;
+  row.innerHTML = `
+    <div class="emoji-tile" style="background:${bg}">${emoji}</div>
+    <div class="recipe-info">
+      <div class="recipe-name-row">
+        <span class="recipe-name">${esc(r.name)}</span>
+        ${flag ? `<span class="cuisine-flag">${flag}</span>` : ''}
+      </div>
+      ${showEnglish ? `<div class="recipe-english">${esc(r.english_name)}</div>` : ''}
+      <div class="recipe-meta">
+        ${bookTitle ? `<span class="recipe-book-name">${esc(bookTitle)}</span>` : ''}
+        <span class="page-num">p.&nbsp;${r.page}</span>
+        ${pills}
+      </div>
+    </div>`;
+  return row;
+}
+
+// ─────────────────────────────────────────────
+// BOOK FILTER CHIPS (multi-select)
+// ─────────────────────────────────────────────
+function buildBookChips() {
+  // Clear existing book chips (keep the "All Books" button)
+  const existing = bookChipsRow.querySelectorAll('.book-chip');
+  existing.forEach(c => c.remove());
+
+  Object.values(ALL_BOOKS).forEach(book => {
+    const chip = document.createElement('button');
+    chip.className = 'book-chip';
+    chip.textContent = book.title;
+    chip.dataset.bookId = book.id;
+    bookChipsRow.appendChild(chip);
+  });
+
+  bookChipsRow.addEventListener('click', e => {
+    const chip = e.target.closest('.book-chip');
+    const clearChip = e.target.closest('#book-filter-clear');
+
+    if (clearChip) {
+      activeBookFilters.clear();
+      bookChipsRow.querySelectorAll('.book-chip').forEach(c => c.classList.remove('active'));
+      applyFilters();
+      return;
+    }
+
+    if (!chip) return;
+    const id = chip.dataset.bookId;
+    if (activeBookFilters.has(id)) {
+      activeBookFilters.delete(id);
+      chip.classList.remove('active');
+    } else {
+      activeBookFilters.add(id);
+      chip.classList.add('active');
+    }
+    applyFilters();
+  });
+}
+
+// ─────────────────────────────────────────────
+// EVENTS
+// ─────────────────────────────────────────────
+searchInput.addEventListener('focus', () => {
+  if (mode === 'home') enterSearch();
+});
+
+searchInput.addEventListener('input', () => {
+  searchQuery = searchInput.value;
+  clearBtn.classList.toggle('visible', searchQuery.length > 0);
+  if (mode !== 'search') enterSearch();
+  applyFilters();
+});
+
+clearBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  searchQuery = '';
+  clearBtn.classList.remove('visible');
+  searchInput.blur();
+  if (mode === 'search') showHome();
+});
+
+backBtn.addEventListener('click', () => {
+  searchInput.blur();
+  showHome();
+});
+
+document.getElementById('diet-chips').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  activeDietFilter = chip.dataset.filter;
+  applyFilters();
+});
+
+// ─────────────────────────────────────────────
+// LOAD DATA
+// ─────────────────────────────────────────────
+async function loadData() {
+  try {
+    const res = await fetch('cookbooks_data_final.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    data.books.forEach(b => { ALL_BOOKS[b.id] = b; });
+    ALL_RECIPES = data.recipes;
+
+    loadingEl.style.display = 'none';
+    buildBookChips();
+    buildHomeScreen();
+    showHome();
+  } catch (err) {
+    loadingEl.innerHTML = `<div style="color:var(--accent);font-size:15px;padding:32px;text-align:center">
+      ⚠️ Could not load recipes.<br><span style="font-size:13px;color:#999;margin-top:8px;display:block">${err.message}</span>
+    </div>`;
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
